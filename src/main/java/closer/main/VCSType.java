@@ -1,4 +1,12 @@
 package closer.main;
 
-public class VCSType {
+/**
+ * Enum fo types of input and output formats supported
+ */
+public enum VCSType{
+    CLOSER,
+    GIT,
+    SVN,
+    HG
 }
+

@@ -46,13 +46,5 @@ public class Main {
         }
         log.info("Finished CLOSER command line tool execution");
     }
-
-    public static VCSType parseVCSTypeFromCommandLineArgument(String argument) {
-        try {
-            return VCSType.valueOf(argument);
-        } catch (IllegalArgumentException | NullPointerException e) {
-            return null;
-        }
-    }
 }
 

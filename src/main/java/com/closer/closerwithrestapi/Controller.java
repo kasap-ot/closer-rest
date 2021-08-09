@@ -32,32 +32,40 @@ public class Controller {
         ParserSelector parserSelector = new ParserSelector();
 
         VCSType inType;
-        try {
-            inType = VCSType.valueOf(inputFormat);
-        } catch (IllegalArgumentException | NullPointerException exception) {
-            String exceptionMessage = "Invalid input format in path - " + inputFormat;
-            return new ResponseEntity<>(exceptionMessage, HttpStatus.BAD_REQUEST);
+
+        try { inType = VCSType.valueOf(inputFormat); }
+        catch (IllegalArgumentException | NullPointerException exception)
+        {
+            String errorMsg = "Invalid input format in path - " + inputFormat;
+            return new ResponseEntity<>(errorMsg, HttpStatus.BAD_REQUEST);
         }
 
         Parser inParser = parserSelector.selectParser(inType);
         List<Revision> revisions = new ArrayList<>();
+
         revisions.addAll(inParser.parseInputToFormat(textLogLines));
+        if (revisions.size() == 0)
+        {
+            String errorMsg = "Text-log format does not match input format in path - " + inputFormat;
+            return new ResponseEntity<>(errorMsg, HttpStatus.BAD_REQUEST);
+        }
 
         VCSType outType;
-        try {
-            outType = VCSType.valueOf(outputFormat);
-        } catch (IllegalArgumentException | NullPointerException exception) {
-            String exceptionMessage = "Invalid output format in path - " + outputFormat;
-            return new ResponseEntity<>(exceptionMessage, HttpStatus.BAD_REQUEST);
+
+        try { outType = VCSType.valueOf(outputFormat); }
+        catch (IllegalArgumentException | NullPointerException e)
+        {
+            String errorMsg = "Invalid output format in path - " + outputFormat;
+            return new ResponseEntity<>(errorMsg, HttpStatus.BAD_REQUEST);
         }
 
         Parser outParser = parserSelector.selectParser(outType);
         String outputString = outParser.parseRevisionsToOutputFormat(revisions);
 
-        String returnMessage = "Conversion: " + inputFormat + " to " + outputFormat + '\n' +
-                                "---------------------------------------------------" + '\n' +
-                                outputString;
+        String returnMsg = "Conversion: " + inputFormat + " to " + outputFormat + '\n' +
+                            "---------------------------------------------------" + '\n' +
+                            outputString;
 
-        return new ResponseEntity<>(returnMessage, HttpStatus.OK);
+        return new ResponseEntity<>(returnMsg, HttpStatus.OK);
     }
 }

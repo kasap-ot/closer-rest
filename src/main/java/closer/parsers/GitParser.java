@@ -38,7 +38,7 @@ public class GitParser implements Parser {
     @Override
     public List<Revision> parseInputToFormat(List<String> linesOfInput) {
         //Add additional blank line to make sure there is a uniform format
-        //linesOfInput.add("");
+        linesOfInput.add("");
         log.info("Calculate commit starting points for the Git log");
         List<Integer> commitStarts = extractRevisionStartingPoints(linesOfInput, "commit [a-f0-9]{40}");
         log.info("Input file contains "+commitStarts.size()+" revisions");

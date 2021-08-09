@@ -25,13 +25,19 @@ public class Controller {
     @RequestMapping(method = RequestMethod.POST, value = "convert/{inputFormat}/{outputFormat}")
     public String convert(@PathVariable String inputFormat, @PathVariable String outputFormat, @RequestBody String textLog)
     {
-        List<String> textLogLines = Arrays.asList(textLog.split("\\n"));
+        ArrayList<String> textLogLines = new ArrayList<>(Arrays.asList(textLog.split("\\r?\\n|\\r")));
         ParserSelector parserSelector = new ParserSelector();
+
+        if (!inputFormat.equals("GIT") && !inputFormat.equals("SVN") && !inputFormat.equals("HG") && !inputFormat.equals("CLOSER"))
+            return "Invalid input format in path - " + inputFormat;
 
         VCSType inType = VCSType.valueOf(inputFormat);
         Parser inParser = parserSelector.selectParser(inType);
         List<Revision> revisions = new ArrayList<>();
-        revisions.addAll(inParser.parseInputToFormat(textLogLines)); // Here there was a problem, had to remove one line from source code
+        revisions.addAll(inParser.parseInputToFormat(textLogLines));
+
+        if (!outputFormat.equals("GIT") && !outputFormat.equals("SVN") && !outputFormat.equals("HG") && !outputFormat.equals("CLOSER"))
+            return "Invalid output format in path - " + outputFormat;
 
         VCSType outType = VCSType.valueOf(outputFormat);
         Parser outParser = parserSelector.selectParser(outType);

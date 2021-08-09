@@ -31,12 +31,5 @@ public class ArgumentValidator {
             throw new CloserException(CloserErrorCode.CLOSER_TYPE_PARSING_ERROR, map);
         }
     }
-
-    public static void validateOutputMode(boolean append, boolean overwrite) {
-        //Cannot be in both append and overwrite modes at the same time
-        if (append && overwrite){
-            throw new CloserException(CloserErrorCode.CANNOT_OVERWRITE_AND_APPEND_TO_OUTPUT_FILE);
-        }
-    }
 }
 

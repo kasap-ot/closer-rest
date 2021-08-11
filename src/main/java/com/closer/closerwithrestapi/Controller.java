@@ -5,6 +5,7 @@ import closer.main.VCSType;
 import closer.models.dsl.Revision;
 import closer.parsers.Parser;
 import closer.parsers.ParserSelector;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class Controller {
         catch (IllegalArgumentException | NullPointerException exception)
         {
             String errorMsg = "Invalid input format in path - " + inputFormat;
-            return new ResponseEntity<>(errorMsg, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(errorMsg);
         }
 
         Parser inParser = parserSelector.selectParser(inType);
@@ -47,7 +48,7 @@ public class Controller {
         if (revisions.size() == 0)
         {
             String errorMsg = "Text-log format does not match input format in path - " + inputFormat;
-            return new ResponseEntity<>(errorMsg, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(errorMsg);
         }
 
         VCSType outType;
@@ -56,16 +57,17 @@ public class Controller {
         catch (IllegalArgumentException | NullPointerException e)
         {
             String errorMsg = "Invalid output format in path - " + outputFormat;
-            return new ResponseEntity<>(errorMsg, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(errorMsg);
         }
 
         Parser outParser = parserSelector.selectParser(outType);
         String outputString = outParser.parseRevisionsToOutputFormat(revisions);
 
-        String returnMsg = "Conversion: " + inputFormat + " to " + outputFormat + '\n' +
-                            "---------------------------------------------------" + '\n' +
-                            outputString;
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Response-Message", "Conversion from " + inputFormat + " to " + outputFormat);
+        if (outType == VCSType.CLOSER)
+            responseHeaders.set("content-type", "application/json");
 
-        return new ResponseEntity<>(returnMsg, HttpStatus.OK);
+        return ResponseEntity.ok().headers(responseHeaders).body(outputString);
     }
 }
